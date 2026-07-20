@@ -1,4 +1,4 @@
-package src;
+package com.wong.stockmanagement;
 public class TV extends Product {
 	private String screenType;
 	private String resolution;

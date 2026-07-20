@@ -1,4 +1,4 @@
-package src;
+package com.wong.stockmanagement;
 
 import java.util.Scanner;
 import java.util.InputMismatchException;
