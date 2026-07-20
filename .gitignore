@@ -1,0 +1,14 @@
+
+# Compiled files
+*.class
+out/
+bin/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Previous Eclipse settings
+.settings/
+.classpath
+.project
