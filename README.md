@@ -17,8 +17,11 @@ The active development branch is `javafx-ui`, which contains the JavaFX v2.0 app
 
 ### Inventory Dashboard
 
-- View every product in a JavaFX `TableView`.
+- View every product in a sortable JavaFX `TableView`.
 - Display item number, name, category, price, quantity, inventory value, and status.
+- Search by product name, item number, or product type.
+- Filter the table by product category and active/discontinued status.
+- Clear all search and filter selections with one button.
 - Automatically update total products, total units, active products, and total inventory value.
 - Disable unavailable actions when no product is selected or a product is discontinued.
 
@@ -77,6 +80,7 @@ src/com/wong/stockmanagement/
 ├── InventoryException.java      Custom business exception
 ├── StockManagement.java         Original console application
 ├── StockManagementApp.java      JavaFX application and dashboard
+├── InventoryFilterPane.java     Product search and filter controls
 ├── ProductDialog.java           Product-creation form
 ├── StockQuantityDialog.java     Add-stock and deduct-stock form
 ├── ProductDetailsDialog.java    Read-only product details
@@ -116,9 +120,10 @@ The JavaFX Maven plugin supplies the required JavaFX modules and native-access o
 2. Confirm the generated User ID and select **Continue**.
 3. Select **Add Product** and choose a product category.
 4. Complete the common information and category-specific fields.
-5. Select a product from the inventory table.
-6. Use **Add Stock**, **Deduct Stock**, **Discontinue**, or **View Details**.
-7. Review the automatically updated summary cards at the bottom of the dashboard.
+5. Use the search, product-type, or status filters to locate products.
+6. Select a product from the inventory table.
+7. Use **Add Stock**, **Deduct Stock**, **Discontinue**, or **View Details**.
+8. Review the automatically updated summary cards at the bottom of the dashboard.
 
 ## Version History
 
@@ -137,6 +142,7 @@ The JavaFX Maven plugin supplies the required JavaFX modules and native-access o
 - Refactored the source files into the `com.wong.stockmanagement` package.
 - Added `InventoryManager` and `InventoryException`.
 - Added the JavaFX dashboard, product table, and inventory summary cards.
+- Added product search, type filtering, status filtering, and column sorting.
 - Added a validated Welcome dialog and User ID display.
 - Added a validated product-creation dialog for all four categories.
 - Added add-stock and deduct-stock dialogs.

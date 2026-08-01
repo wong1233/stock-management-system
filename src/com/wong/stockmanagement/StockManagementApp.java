@@ -6,6 +6,8 @@ import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ListChangeListener;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -36,6 +38,8 @@ public class StockManagementApp extends Application {
 
     private UserInfo currentUser;
     private TableView<Product> productTable;
+    private FilteredList<Product> filteredProducts;
+    private InventoryFilterPane inventoryFilterPane;
     private Label totalProductsValue;
     private Label totalUnitsValue;
     private Label activeProductsValue;
@@ -53,6 +57,10 @@ public class StockManagementApp extends Application {
             return;
         }
 
+        filteredProducts = new FilteredList<>(
+                inventoryManager.getProducts(),
+                product -> true
+        );
         productTable = createProductTable();
 
         BorderPane root = new BorderPane();
@@ -182,15 +190,22 @@ public class StockManagementApp extends Application {
         sectionTitle.setStyle("-fx-font-size: 21px; -fx-font-weight: bold; -fx-text-fill: #172033;");
 
         Label sectionSubtitle = new Label(
-                "Select a product to manage its stock, status, or details."
+                "Search or filter products, then select one to manage its inventory."
         );
         sectionSubtitle.setStyle("-fx-font-size: 13px; -fx-text-fill: #64748b;");
 
         VBox sectionHeading = new VBox(4, sectionTitle, sectionSubtitle);
+        inventoryFilterPane = new InventoryFilterPane(this::applyProductFilters);
 
         HBox summaryBar = createSummaryBar();
 
-        VBox dashboard = new VBox(18, sectionHeading, productTable, summaryBar);
+        VBox dashboard = new VBox(
+                18,
+                sectionHeading,
+                inventoryFilterPane,
+                productTable,
+                summaryBar
+        );
         dashboard.setPadding(new Insets(24));
         dashboard.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
         VBox.setVgrow(productTable, Priority.ALWAYS);
@@ -199,16 +214,19 @@ public class StockManagementApp extends Application {
 
     private TableView<Product> createProductTable() {
         TableView<Product> table = new TableView<>();
-        table.setItems(inventoryManager.getProducts());
+
+        SortedList<Product> sortedProducts = new SortedList<>(filteredProducts);
+        sortedProducts.comparatorProperty().bind(table.comparatorProperty());
+        table.setItems(sortedProducts);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         table.setStyle(
                 "-fx-background-color: white; -fx-border-color: #dbe2ea; " +
                         "-fx-border-radius: 6px; -fx-background-radius: 6px;"
         );
 
-        Label emptyTitle = new Label("No products in inventory");
+        Label emptyTitle = new Label("No products to display");
         emptyTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #475569;");
-        Label emptyHint = new Label("Use Add Product to create the first inventory item.");
+        Label emptyHint = new Label("Add a product or adjust the search and filters.");
         emptyHint.setStyle("-fx-font-size: 12px; -fx-text-fill: #94a3b8;");
         VBox placeholder = new VBox(7, emptyTitle, emptyHint);
         placeholder.setAlignment(Pos.CENTER);
@@ -377,6 +395,7 @@ public class StockManagementApp extends Application {
     }
 
     private void refreshDashboard() {
+        applyProductFilters();
         productTable.refresh();
         totalProductsValue.setText(String.valueOf(inventoryManager.getTotalProducts()));
         totalUnitsValue.setText(String.valueOf(inventoryManager.getTotalQuantity()));
@@ -384,6 +403,12 @@ public class StockManagementApp extends Application {
         totalValueValue.setText(String.format("RM %,.2f", inventoryManager.getTotalInventoryValue()));
 
         updateActionButtons(productTable.getSelectionModel().getSelectedItem());
+    }
+
+    private void applyProductFilters() {
+        if (filteredProducts != null && inventoryFilterPane != null) {
+            filteredProducts.setPredicate(inventoryFilterPane.createPredicate());
+        }
     }
 
     private String getProductType(Product product) {
