@@ -76,10 +76,3 @@ Run the `StockManagement` main class from IntelliJ IDEA.
 
 - `main` — stable console version tagged as `v1.0`.
 - `javafx-ui` — JavaFX `v2.0` development branch.
-
-## Authors
-
-- Hong Chee Ren
-- Lee Jing Wei
-- Lee Sun Sheng
-- Wong Ting Kai
