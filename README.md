@@ -8,6 +8,13 @@ The active development branch is `javafx-ui`, which contains the JavaFX v2.0 app
 
 ## Features
 
+### User Information
+
+- Request the user's first name and surname before opening the dashboard.
+- Generate a User ID using the existing `UserInfo` rules.
+- Validate empty or incomplete names.
+- Display the active user's name and User ID in the dashboard header.
+
 ### Inventory Dashboard
 
 - View every product in a JavaFX `TableView`.
@@ -73,6 +80,7 @@ src/com/wong/stockmanagement/
 ├── ProductDialog.java           Product-creation form
 ├── StockQuantityDialog.java     Add-stock and deduct-stock form
 ├── ProductDetailsDialog.java    Read-only product details
+├── UserInfoDialog.java          JavaFX user-information form
 └── UserInfo.java                User-name and ID generation
 ```
 
@@ -104,11 +112,13 @@ The JavaFX Maven plugin supplies the required JavaFX modules and native-access o
 
 ## Basic Usage
 
-1. Select **Add Product** and choose a product category.
-2. Complete the common information and category-specific fields.
-3. Select a product from the inventory table.
-4. Use **Add Stock**, **Deduct Stock**, **Discontinue**, or **View Details**.
-5. Review the automatically updated summary cards at the bottom of the dashboard.
+1. Enter your first name and surname in the Welcome dialog.
+2. Confirm the generated User ID and select **Continue**.
+3. Select **Add Product** and choose a product category.
+4. Complete the common information and category-specific fields.
+5. Select a product from the inventory table.
+6. Use **Add Stock**, **Deduct Stock**, **Discontinue**, or **View Details**.
+7. Review the automatically updated summary cards at the bottom of the dashboard.
 
 ## Version History
 
@@ -127,6 +137,7 @@ The JavaFX Maven plugin supplies the required JavaFX modules and native-access o
 - Refactored the source files into the `com.wong.stockmanagement` package.
 - Added `InventoryManager` and `InventoryException`.
 - Added the JavaFX dashboard, product table, and inventory summary cards.
+- Added a validated Welcome dialog and User ID display.
 - Added a validated product-creation dialog for all four categories.
 - Added add-stock and deduct-stock dialogs.
 - Added discontinue confirmation and a product-details dialog.

@@ -1,6 +1,7 @@
 package com.wong.stockmanagement;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -33,6 +34,7 @@ public class StockManagementApp extends Application {
 
     private final InventoryManager inventoryManager = new InventoryManager();
 
+    private UserInfo currentUser;
     private TableView<Product> productTable;
     private Label totalProductsValue;
     private Label totalUnitsValue;
@@ -46,6 +48,11 @@ public class StockManagementApp extends Application {
 
     @Override
     public void start(Stage stage) {
+        if (!collectUserInformation()) {
+            Platform.exit();
+            return;
+        }
+
         productTable = createProductTable();
 
         BorderPane root = new BorderPane();
@@ -69,6 +76,12 @@ public class StockManagementApp extends Application {
         stage.show();
     }
 
+    private boolean collectUserInformation() {
+        UserInfoDialog dialog = new UserInfoDialog();
+        currentUser = dialog.showAndWait().orElse(null);
+        return currentUser != null;
+    }
+
     private HBox createHeader() {
         Label title = new Label("Stock Management System");
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
@@ -81,19 +94,30 @@ public class StockManagementApp extends Application {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
+        Label userName = new Label("Welcome, " + currentUser.getUserName());
+        userName.setStyle(
+                "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;"
+        );
+
+        Label userId = new Label("User ID: " + currentUser.getUserID());
+        userId.setStyle("-fx-font-size: 12px; -fx-text-fill: #cbd5e1;");
+
         String formattedDate = LocalDate.now().format(
                 DateTimeFormatter.ofPattern("dd MMM yyyy")
         );
         Label date = new Label(formattedDate);
-        date.setStyle("-fx-font-size: 13px; -fx-text-fill: #e2e8f0;");
+        date.setStyle("-fx-font-size: 12px; -fx-text-fill: #e2e8f0;");
 
         Label version = new Label("JavaFX v2.0");
         version.setStyle(
-                "-fx-background-color: #334155; -fx-background-radius: 14px; " +
-                        "-fx-padding: 7px 12px; -fx-text-fill: white; -fx-font-weight: bold;"
+                "-fx-background-color: #334155; -fx-background-radius: 14px; "
+                        + "-fx-padding: 6px 11px; -fx-text-fill: white; -fx-font-weight: bold;"
         );
 
-        VBox headerInfo = new VBox(7, date, version);
+        HBox metadata = new HBox(10, date, version);
+        metadata.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox headerInfo = new VBox(4, userName, userId, metadata);
         headerInfo.setAlignment(Pos.CENTER_RIGHT);
 
         HBox header = new HBox(20, titleBox, spacer, headerInfo);
