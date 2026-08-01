@@ -3,7 +3,6 @@ package com.wong.stockmanagement;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -22,7 +21,7 @@ public class InventoryManager {
     }
 
     public void addProduct(Product product) {
-        Objects.requireNonNull(product, "Product cannot be null.");
+        requireProduct(product);
         validateNewProduct(product);
         products.add(product);
     }
@@ -42,7 +41,7 @@ public class InventoryManager {
         requireActiveProduct(product);
 
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity to add must be greater than 0.");
+            throw new InventoryException("Quantity to add must be greater than 0.");
         }
 
         product.addStock(quantity);
@@ -53,10 +52,10 @@ public class InventoryManager {
         requireActiveProduct(product);
 
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity to deduct must be greater than 0.");
+            throw new InventoryException("Quantity to deduct must be greater than 0.");
         }
         if (quantity > product.getQuantityAvailable()) {
-            throw new IllegalArgumentException(
+            throw new InventoryException(
                     "Not enough stock. Current quantity is " + product.getQuantityAvailable() + "."
             );
         }
@@ -94,35 +93,41 @@ public class InventoryManager {
 
     private void validateNewProduct(Product product) {
         if (product.getItemNum() <= 0) {
-            throw new IllegalArgumentException("Item number must be greater than 0.");
+            throw new InventoryException("Item number must be greater than 0.");
         }
         if (isItemNumberInUse(product.getItemNum())) {
-            throw new IllegalArgumentException(
+            throw new InventoryException(
                     "Item number " + product.getItemNum() + " is already in use."
             );
         }
         if (product.getProductName() == null || product.getProductName().isBlank()) {
-            throw new IllegalArgumentException("Product name cannot be empty.");
+            throw new InventoryException("Product name cannot be empty.");
         }
         if (product.getPrice() <= 0) {
-            throw new IllegalArgumentException("Price must be greater than 0.");
+            throw new InventoryException("Price must be greater than 0.");
         }
         if (product.getQuantityAvailable() < 0) {
-            throw new IllegalArgumentException("Initial quantity cannot be negative.");
+            throw new InventoryException("Initial quantity cannot be negative.");
         }
     }
 
     private void requireManagedProduct(Product product) {
-        Objects.requireNonNull(product, "Product cannot be null.");
+        requireProduct(product);
 
         if (!products.contains(product)) {
-            throw new IllegalArgumentException("The selected product is not in the inventory.");
+            throw new InventoryException("The selected product is not in the inventory.");
         }
     }
 
     private void requireActiveProduct(Product product) {
         if (!product.getStatus()) {
-            throw new IllegalStateException("The selected product is discontinued.");
+            throw new InventoryException("The selected product is discontinued.");
+        }
+    }
+
+    private void requireProduct(Product product) {
+        if (product == null) {
+            throw new InventoryException("Product cannot be null.");
         }
     }
 }
