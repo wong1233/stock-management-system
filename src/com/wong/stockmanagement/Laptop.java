@@ -1,4 +1,4 @@
-package src;
+package com.wong.stockmanagement;
 public class Laptop extends Product {
 	private String color;
 	private String processor;

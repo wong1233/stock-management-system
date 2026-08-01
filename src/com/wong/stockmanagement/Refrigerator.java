@@ -1,4 +1,4 @@
-package src;
+package com.wong.stockmanagement;
 public class Refrigerator extends Product {
 	private String doorDesign;
 	private String color;

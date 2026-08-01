@@ -1,4 +1,4 @@
-package src;
+package com.wong.stockmanagement;
 
 public class WashingMachine extends Product {
 	private String loadType;

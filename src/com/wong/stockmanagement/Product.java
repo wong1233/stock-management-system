@@ -1,4 +1,4 @@
-package src;
+package com.wong.stockmanagement;
 public abstract class Product {
 	private String productName;
 	private int itemNum;
