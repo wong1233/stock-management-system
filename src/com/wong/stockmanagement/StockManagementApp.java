@@ -35,6 +35,7 @@ public class StockManagementApp extends Application {
     private static final String PRIMARY_COLOR = "#2563eb";
 
     private final InventoryManager inventoryManager = new InventoryManager();
+    private final InventoryStorage inventoryStorage = InventoryStorage.createDefault();
 
     private UserInfo currentUser;
     private TableView<Product> productTable;
@@ -57,6 +58,8 @@ public class StockManagementApp extends Application {
             return;
         }
 
+        loadSavedInventory();
+
         filteredProducts = new FilteredList<>(
                 inventoryManager.getProducts(),
                 product -> true
@@ -71,7 +74,10 @@ public class StockManagementApp extends Application {
 
         configureSelectionBehavior();
         inventoryManager.getProducts().addListener(
-                (ListChangeListener<Product>) change -> refreshDashboard()
+                (ListChangeListener<Product>) change -> {
+                    refreshDashboard();
+                    saveInventory();
+                }
         );
         refreshDashboard();
 
@@ -82,6 +88,33 @@ public class StockManagementApp extends Application {
         stage.setMinHeight(640);
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void loadSavedInventory() {
+        try {
+            inventoryManager.replaceProducts(inventoryStorage.loadProducts());
+        } catch (InventoryException exception) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Unable to Load Inventory");
+            alert.setHeaderText("The saved inventory could not be loaded");
+            alert.setContentText(
+                    exception.getMessage()
+                            + "\n\nA new empty inventory will be used."
+            );
+            alert.showAndWait();
+        }
+    }
+
+    private void saveInventory() {
+        try {
+            inventoryStorage.saveProducts(inventoryManager.getProducts());
+        } catch (InventoryException exception) {
+            showAlert(
+                    Alert.AlertType.ERROR,
+                    "Unable to Save Inventory",
+                    exception.getMessage()
+            );
+        }
     }
 
     private boolean collectUserInformation() {
@@ -466,6 +499,7 @@ public class StockManagementApp extends Application {
                 inventoryManager.deductStock(product, quantity);
             }
 
+            saveInventory();
             refreshDashboard();
             String action = operation == StockQuantityDialog.Operation.ADD
                     ? "added to"
@@ -509,6 +543,7 @@ public class StockManagementApp extends Application {
 
         try {
             inventoryManager.discontinueProduct(product);
+            saveInventory();
             refreshDashboard();
             showAlert(
                     Alert.AlertType.INFORMATION,

@@ -49,6 +49,20 @@ The active development branch is `javafx-ui`, which contains the JavaFX v2.0 app
 - Use `InventoryException` for inventory business-rule failures.
 - Display validation failures through JavaFX error dialogs.
 
+### Local Data Persistence
+
+- Automatically load the saved inventory when the JavaFX application starts.
+- Automatically save after products, quantities, or statuses change.
+- Preserve all common fields, category-specific specifications, and discontinued status.
+- Use a versioned binary format with atomic file replacement.
+- Show an error and continue with an empty inventory if the saved file is damaged.
+
+The inventory data is stored locally at:
+
+```text
+%USERPROFILE%\.stock-management-system\inventory.dat
+```
+
 ## Supported Product Categories
 
 | Category | Additional information |
@@ -77,6 +91,7 @@ src/com/wong/stockmanagement/
 ├── WashingMachine.java          Washing-machine model
 ├── ProductType.java             Supported product categories
 ├── InventoryManager.java        Inventory collection and business rules
+├── InventoryStorage.java        Local inventory save/load service
 ├── InventoryException.java      Custom business exception
 ├── StockManagement.java         Original console application
 ├── StockManagementApp.java      JavaFX application and dashboard
@@ -124,6 +139,7 @@ The JavaFX Maven plugin supplies the required JavaFX modules and native-access o
 6. Select a product from the inventory table.
 7. Use **Add Stock**, **Deduct Stock**, **Discontinue**, or **View Details**.
 8. Review the automatically updated summary cards at the bottom of the dashboard.
+9. Close and reopen the application to confirm that the inventory is restored automatically.
 
 ## Version History
 
@@ -143,6 +159,7 @@ The JavaFX Maven plugin supplies the required JavaFX modules and native-access o
 - Added `InventoryManager` and `InventoryException`.
 - Added the JavaFX dashboard, product table, and inventory summary cards.
 - Added product search, type filtering, status filtering, and column sorting.
+- Added automatic local inventory saving and startup loading.
 - Added a validated Welcome dialog and User ID display.
 - Added a validated product-creation dialog for all four categories.
 - Added add-stock and deduct-stock dialogs.

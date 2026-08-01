@@ -3,6 +3,7 @@ package com.wong.stockmanagement;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -18,6 +19,16 @@ public class InventoryManager {
      */
     public ObservableList<Product> getProducts() {
         return readOnlyProducts;
+    }
+
+    public void replaceProducts(Collection<? extends Product> replacementProducts) {
+        if (replacementProducts == null) {
+            throw new InventoryException("Loaded inventory cannot be null.");
+        }
+
+        InventoryManager validatedInventory = new InventoryManager();
+        replacementProducts.forEach(validatedInventory::addProduct);
+        products.setAll(validatedInventory.products);
     }
 
     public void addProduct(Product product) {
