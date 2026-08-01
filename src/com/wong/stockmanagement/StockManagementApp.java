@@ -113,10 +113,7 @@ public class StockManagementApp extends Application {
         discontinueButton = createActionButton("Discontinue", "#b91c1c");
         viewDetailsButton = createActionButton("View Details", "#475569");
 
-        addProductButton.setOnAction(event -> showPlannedFeature(
-                "Add Product",
-                "The product creation form will be implemented in Step 4."
-        ));
+        addProductButton.setOnAction(event -> openAddProductDialog());
         addStockButton.setOnAction(event -> showPlannedFeature(
                 "Add Stock",
                 "Stock operations will be connected in Step 5."
@@ -372,17 +369,52 @@ public class StockManagementApp extends Application {
     }
 
     private String getProductType(Product product) {
-        if (product instanceof WashingMachine) {
-            return "Washing Machine";
+        return ProductType.fromProduct(product).toString();
+    }
+
+    private void openAddProductDialog() {
+        ProductDialog dialog = new ProductDialog();
+
+        if (productTable.getScene() != null) {
+            dialog.initOwner(productTable.getScene().getWindow());
         }
-        return product.getClass().getSimpleName();
+
+        dialog.showAndWait().ifPresent(this::addProduct);
+    }
+
+    private void addProduct(Product product) {
+        try {
+            inventoryManager.addProduct(product);
+            productTable.getSelectionModel().select(product);
+            refreshDashboard();
+            showAlert(
+                    Alert.AlertType.INFORMATION,
+                    "Product Added",
+                    product.getProductName() + " was added successfully."
+            );
+        } catch (InventoryException exception) {
+            showAlert(
+                    Alert.AlertType.ERROR,
+                    "Unable to Add Product",
+                    exception.getMessage()
+            );
+        }
     }
 
     private void showPlannedFeature(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        showAlert(Alert.AlertType.INFORMATION, title, message);
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(title);
         alert.setContentText(message);
+
+        if (productTable.getScene() != null) {
+            alert.initOwner(productTable.getScene().getWindow());
+        }
+
         alert.showAndWait();
     }
 
