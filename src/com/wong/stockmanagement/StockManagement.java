@@ -20,13 +20,6 @@ public class StockManagement {
 		
 		System.out.println("Welcome to SMS!");
 		System.out.println(Date);
-		System.out.println("------------------------------------------------------");
-		System.out.println("Group member:");
-		System.out.println("1. Hong Chee Ren");
-		System.out.println("2. Lee Jing Wei");
-		System.out.println("3. Lee Sun Sheng");
-		System.out.println("4. Wong Ting Kai");
-		System.out.println("------------------------------------------------------");
 
 		// Allow user input full name
 		UserInfo user = new UserInfo();
