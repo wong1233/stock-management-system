@@ -80,6 +80,15 @@ The inventory data is stored locally at:
 - IntelliJ IDEA
 - Git and GitHub
 
+## Architecture
+
+The JavaFX version separates responsibilities so that interface code does not contain inventory business rules:
+
+- **Model** — `Product` and its four subclasses represent inventory data.
+- **Service** — `InventoryManager` validates inventory operations, while `InventoryStorage` saves and loads products.
+- **View** — `InventoryDashboardView`, `InventoryFilterPane`, and the dialog classes build and update the JavaFX interface.
+- **Application** — `StockManagementApp` coordinates user actions, services, persistence, dialogs, and the main stage.
+
 ## Project Structure
 
 ```text
@@ -94,7 +103,8 @@ src/com/wong/stockmanagement/
 ├── InventoryStorage.java        Local inventory save/load service
 ├── InventoryException.java      Custom business exception
 ├── StockManagement.java         Original console application
-├── StockManagementApp.java      JavaFX application and dashboard
+├── StockManagementApp.java      JavaFX application workflow coordinator
+├── InventoryDashboardView.java Dashboard layout, table, and summary view
 ├── InventoryFilterPane.java     Product search and filter controls
 ├── ProductDialog.java           Product-creation form
 ├── StockQuantityDialog.java     Add-stock and deduct-stock form
@@ -160,6 +170,7 @@ The JavaFX Maven plugin supplies the required JavaFX modules and native-access o
 - Added the JavaFX dashboard, product table, and inventory summary cards.
 - Added product search, type filtering, status filtering, and column sorting.
 - Added automatic local inventory saving and startup loading.
+- Separated dashboard presentation from application workflow responsibilities.
 - Added a validated Welcome dialog and User ID display.
 - Added a validated product-creation dialog for all four categories.
 - Added add-stock and deduct-stock dialogs.
