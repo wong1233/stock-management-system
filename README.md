@@ -19,9 +19,12 @@ A Java application for managing refrigerators, TVs, laptops, and washing machine
 - Refactored source files into the `com.wong.stockmanagement` package.
 - Added `InventoryManager` for product and stock operations.
 - Added duplicate item-number validation.
-- Added inventory quantity and value summaries.
 - Added the custom `InventoryException` for business-rule failures.
-- JavaFX dashboard and product-management dialogs are under development.
+- Added the JavaFX inventory dashboard.
+- Added the product `TableView`.
+- Added inventory summary cards.
+- Added selection-aware inventory action buttons.
+- Product creation and stock-operation dialogs are under development.
 
 ## Technologies
 
