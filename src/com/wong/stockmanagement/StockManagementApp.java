@@ -10,6 +10,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -114,22 +116,14 @@ public class StockManagementApp extends Application {
         viewDetailsButton = createActionButton("View Details", "#475569");
 
         addProductButton.setOnAction(event -> openAddProductDialog());
-        addStockButton.setOnAction(event -> showPlannedFeature(
-                "Add Stock",
-                "Stock operations will be connected in Step 5."
+        addStockButton.setOnAction(event -> openStockQuantityDialog(
+                StockQuantityDialog.Operation.ADD
         ));
-        deductStockButton.setOnAction(event -> showPlannedFeature(
-                "Deduct Stock",
-                "Stock operations will be connected in Step 5."
+        deductStockButton.setOnAction(event -> openStockQuantityDialog(
+                StockQuantityDialog.Operation.DEDUCT
         ));
-        discontinueButton.setOnAction(event -> showPlannedFeature(
-                "Discontinue Product",
-                "Product status actions will be connected in Step 5."
-        ));
-        viewDetailsButton.setOnAction(event -> showPlannedFeature(
-                "Product Details",
-                "The selected product details dialog will be added in a later step."
-        ));
+        discontinueButton.setOnAction(event -> discontinueSelectedProduct());
+        viewDetailsButton.setOnAction(event -> showSelectedProductDetails());
 
         VBox sidebar = new VBox(
                 12,
@@ -375,10 +369,7 @@ public class StockManagementApp extends Application {
     private void openAddProductDialog() {
         ProductDialog dialog = new ProductDialog();
 
-        if (productTable.getScene() != null) {
-            dialog.initOwner(productTable.getScene().getWindow());
-        }
-
+        initializeDialogOwner(dialog);
         dialog.showAndWait().ifPresent(this::addProduct);
     }
 
@@ -401,8 +392,108 @@ public class StockManagementApp extends Application {
         }
     }
 
-    private void showPlannedFeature(String title, String message) {
-        showAlert(Alert.AlertType.INFORMATION, title, message);
+    private void openStockQuantityDialog(StockQuantityDialog.Operation operation) {
+        Product product = getSelectedProduct();
+        if (product == null) {
+            return;
+        }
+
+        StockQuantityDialog dialog = new StockQuantityDialog(product, operation);
+        initializeDialogOwner(dialog);
+        dialog.showAndWait().ifPresent(quantity ->
+                updateStock(product, operation, quantity)
+        );
+    }
+
+    private void updateStock(
+            Product product,
+            StockQuantityDialog.Operation operation,
+            int quantity
+    ) {
+        try {
+            if (operation == StockQuantityDialog.Operation.ADD) {
+                inventoryManager.addStock(product, quantity);
+            } else {
+                inventoryManager.deductStock(product, quantity);
+            }
+
+            refreshDashboard();
+            String action = operation == StockQuantityDialog.Operation.ADD
+                    ? "added to"
+                    : "deducted from";
+            showAlert(
+                    Alert.AlertType.INFORMATION,
+                    "Stock Updated",
+                    quantity + " units were " + action + " "
+                            + product.getProductName() + ".\nNew quantity: "
+                            + product.getQuantityAvailable()
+            );
+        } catch (InventoryException exception) {
+            showAlert(
+                    Alert.AlertType.ERROR,
+                    "Unable to Update Stock",
+                    exception.getMessage()
+            );
+        }
+    }
+
+    private void discontinueSelectedProduct() {
+        Product product = getSelectedProduct();
+        if (product == null) {
+            return;
+        }
+
+        Alert confirmation = new Alert(
+                Alert.AlertType.CONFIRMATION,
+                "Discontinue " + product.getProductName()
+                        + "? Stock operations will no longer be available.",
+                ButtonType.YES,
+                ButtonType.CANCEL
+        );
+        confirmation.setTitle("Discontinue Product");
+        confirmation.setHeaderText("Confirm product status change");
+        initializeDialogOwner(confirmation);
+
+        if (confirmation.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.YES) {
+            return;
+        }
+
+        try {
+            inventoryManager.discontinueProduct(product);
+            refreshDashboard();
+            showAlert(
+                    Alert.AlertType.INFORMATION,
+                    "Product Discontinued",
+                    product.getProductName() + " is now discontinued."
+            );
+        } catch (InventoryException exception) {
+            showAlert(
+                    Alert.AlertType.ERROR,
+                    "Unable to Discontinue Product",
+                    exception.getMessage()
+            );
+        }
+    }
+
+    private void showSelectedProductDetails() {
+        Product product = getSelectedProduct();
+        if (product == null) {
+            return;
+        }
+
+        ProductDetailsDialog dialog = new ProductDetailsDialog(product);
+        initializeDialogOwner(dialog);
+        dialog.showAndWait();
+    }
+
+    private Product getSelectedProduct() {
+        return productTable.getSelectionModel().getSelectedItem();
+    }
+
+    private void initializeDialogOwner(Dialog<?> dialog) {
+        if (productTable.getScene() != null) {
+            dialog.initOwner(productTable.getScene().getWindow());
+        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
@@ -411,10 +502,7 @@ public class StockManagementApp extends Application {
         alert.setHeaderText(title);
         alert.setContentText(message);
 
-        if (productTable.getScene() != null) {
-            alert.initOwner(productTable.getScene().getWindow());
-        }
-
+        initializeDialogOwner(alert);
         alert.showAndWait();
     }
 

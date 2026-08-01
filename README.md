@@ -24,7 +24,10 @@ A Java application for managing refrigerators, TVs, laptops, and washing machine
 - Added the product `TableView`.
 - Added inventory summary cards.
 - Added selection-aware inventory action buttons.
-- Product creation and stock-operation dialogs are under development.
+- Added a validated product-creation dialog for all four product categories.
+- Added validated add-stock and deduct-stock dialogs.
+- Added discontinue confirmation and product-details dialogs.
+- Additional user workflow and UI polish remain in development.
 
 ## Technologies
 
@@ -47,6 +50,10 @@ StockManagement       Console application
 StockManagementApp    JavaFX application
 InventoryManager      Inventory business logic
 InventoryException    Custom inventory exception
+ProductType           Supported product categories
+ProductDialog         Product-creation form
+StockQuantityDialog   Add/deduct stock form
+ProductDetailsDialog  Read-only product details
 UserInfo              User name and ID generation
 ```
 
